@@ -1,191 +1,338 @@
-# TMS Mobile — Transportation Management System
+# 🚚 TMS Mobile — Transportation Management System
 
-Aplikasi mobile untuk driver pada Transportation Management System (TMS), dibangun dengan Expo, React Native, dan TypeScript. Aplikasi ini mencakup bagian proses TMS yang terjadi di jalan: menerima trip, mengerjakan delivery order (DO) stop demi stop, dan mencatat hasilnya.
+<div align="center">
 
-Ini adalah **proyek portofolio independen** yang terinspirasi dari proses bisnis TMS. Aplikasi ini bukan aplikasi resmi perusahaan mana pun dan berjalan sepenuhnya dengan **data sintetis**. Nama driver, kendaraan, pelanggan, alamat, dan nomor dokumen semuanya fiktif. Logo Duta Abadi Primantara dipakai atas izin pemilik proyek ini untuk identitas visual portofolio; tidak ada data, dokumen, atau tangkapan layar internal perusahaan di repositori ini.
+  <img src="assets/images/logo-dap.png" alt="TMS Mobile Logo" width="150"/>
 
-Repositori terkait: [Transportation-Management-System](https://github.com/sirajfatwasidqy/Transportation-Management-System)
+  ### Digitalizing the Last-Mile Delivery Experience
 
-## Tangkapan layar
+  **A modern driver application built with React Native, Expo & TypeScript.**
 
-Ganti placeholder berikut dengan tangkapan layar asli dari ponsel atau emulator Anda (folder yang disarankan: `docs/screenshots/`).
+  <p>
+    <img src="https://img.shields.io/badge/React_Native-0.88-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React Native"/>
+    <img src="https://img.shields.io/badge/Expo-SDK_58-000020?style=for-the-badge&logo=expo&logoColor=white" alt="Expo"/>
+    <img src="https://img.shields.io/badge/TypeScript-Strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/>
+    <img src="https://img.shields.io/badge/Platform-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android"/>
+  </p>
 
-| Masuk | Beranda | Detail trip |
-| :---: | :---: | :---: |
-| ![Masuk](docs/screenshots/login.png) | ![Beranda](docs/screenshots/dashboard.png) | ![Detail trip](docs/screenshots/trip-detail.png) |
+  <p>
+    <a href="#-fitur-unggulan">Fitur</a> •
+    <a href="#-preview-aplikasi">Preview</a> •
+    <a href="#-teknologi">Teknologi</a> •
+    <a href="#-instalasi">Instalasi</a>
+  </p>
 
-| Delivery order | Proses pengiriman | Riwayat |
-| :---: | :---: | :---: |
-| ![Order](docs/screenshots/orders.png) | ![Proses pengiriman](docs/screenshots/delivery-process.png) | ![Riwayat](docs/screenshots/history.png) |
+</div>
 
-## Masalah bisnis
+---
 
-Dalam operasi pengiriman, seorang driver memegang satu trip berisi beberapa delivery order. Dispatcher perlu tahu stop mana yang sudah selesai, mana yang gagal beserta alasannya, dan siapa yang menerima barang. Surat jalan kertas dan pesan chat membuat pencatatan ini lambat dan tidak konsisten: stop terlewat, pengiriman diklaim selesai tanpa nama penerima, dan kegagalan dilaporkan tanpa alasan.
+## 🌟 Tentang Proyek
 
-Aplikasi ini memodelkan sisi driver dari alur tersebut dengan aturan yang eksplisit, sehingga data yang sampai ke dispatcher lengkap dan berada pada status yang valid.
+TMS Mobile adalah aplikasi mobile untuk driver yang berfokus pada operasional pengiriman barang. Aplikasi ini membantu driver mengelola trip, memproses delivery order (DO), mencatat hasil pengiriman, dan memantau riwayat perjalanan melalui satu antarmuka.
 
-## Fitur utama
+Proyek ini merupakan **portofolio independen** yang terinspirasi dari proses bisnis Transportation Management System. Aplikasi menggunakan data sintetis dan bukan merupakan aplikasi resmi perusahaan mana pun.
 
-- **Masuk** dengan validasi input dan akun demo.
-- **Beranda** berisi jumlah trip hari ini (total, aktif, selesai, tertunda), trip aktif dalam bentuk timeline stop, pengiriman hari ini beserta prioritas, dan aktivitas terbaru.
-- **Trip saya** dikelompokkan per tanggal, bisa difilter berdasarkan status, dengan halaman detail untuk kendaraan, jadwal, stop, dan log aktivitas per trip.
-- **Delivery order** dengan pencarian (nomor DO, penerima, kota, alamat) dan filter status.
-- **Proses pengiriman** per order: mulai pengiriman, konfirmasi serah terima (nama penerima, catatan opsional, bukti simulasi), atau laporkan pengiriman gagal beserta alasannya.
-- **Riwayat** trip dan pengiriman yang sudah selesai, bisa difilter berdasarkan rentang tanggal dan hasil.
-- **Profil dan pengaturan**: data driver dan kendaraan, pengaturan pengurutan prioritas, reset data demo, dan keluar.
-- **Penyimpanan lokal**: semua perubahan tersimpan di perangkat dan tetap ada setelah aplikasi dibuka ulang.
+> 🎯 Fokus utama: menyederhanakan alur kerja driver, menerapkan validasi bisnis yang konsisten, dan menjaga status pengiriman tetap terstruktur.
 
-### Aturan bisnis yang diterapkan
+## 📱 Preview Aplikasi
 
-Semua aturan ada di `src/services/tripRules.ts` sebagai fungsi murni dan diuji dengan unit test.
+> Ganti gambar di bawah dengan screenshot asli dari aplikasi yang dijalankan di Expo Go atau emulator Android.
 
-| Area | Aturan |
-| --- | --- |
-| Mulai trip | Hanya trip `Assigned` yang bisa dimulai, hanya pada tanggal jadwalnya, dan hanya jika tidak ada trip lain yang `In Progress`. |
-| Mulai pengiriman | Order bisa dimulai hanya jika trip-nya `In Progress`, dan hanya satu order per trip yang boleh `In Transit`. |
-| Konfirmasi pengiriman | Order harus `In Transit`; nama penerima 3–60 karakter; catatan maksimal 280 karakter. |
-| Bukti pengiriman | Order prioritas `High` wajib memiliki bukti pengiriman sebelum bisa dikonfirmasi. |
-| Lapor gagal | Alasan harus dari daftar tetap; alasan `Lainnya` wajib dijelaskan minimal 5 karakter. |
-| Penutupan trip | Saat semua stop selesai, trip tertutup otomatis: `Completed` jika minimal satu stop terkirim, selain itu `Failed`. |
-| Alur status | Order: `Assigned → In Transit → Delivered / Failed`. Trip: `Assigned → In Progress → Completed / Failed`. Status akhir tidak bisa diubah lagi. |
+<div align="center">
 
-Nilai status disimpan dengan kunci bahasa Inggris di kode dan ditampilkan dalam Bahasa Indonesia di antarmuka (Ditugaskan, Berjalan, Dalam perjalanan, Selesai, Terkirim, Gagal).
+  <table>
+    <tr>
+      <td align="center" width="33%">
+        <b>🔐 Login</b><br/><br/>
+        <img src="docs/screenshots/login.png" width="200" alt="Login Screen"/>
+      </td>
+      <td align="center" width="33%">
+        <b>📊 Beranda</b><br/><br/>
+        <img src="docs/screenshots/dashboard.png" width="200" alt="Dashboard Screen"/>
+      </td>
+      <td align="center" width="33%">
+        <b>🚛 Detail Trip</b><br/><br/>
+        <img src="docs/screenshots/trip-detail.png" width="200" alt="Trip Detail Screen"/>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <b>📦 Delivery Order</b><br/><br/>
+        <img src="docs/screenshots/orders.png" width="200" alt="Delivery Orders"/>
+      </td>
+      <td align="center">
+        <b>✅ Proses Pengiriman</b><br/><br/>
+        <img src="docs/screenshots/delivery-process.png" width="200" alt="Delivery Process"/>
+      </td>
+      <td align="center">
+        <b>📜 Riwayat</b><br/><br/>
+        <img src="docs/screenshots/history.png" width="200" alt="Delivery History"/>
+      </td>
+    </tr>
+  </table>
 
-## Teknologi
+</div>
 
-| Kebutuhan | Pilihan |
-| --- | --- |
-| Framework | React Native 0.88 dengan Expo SDK 58 |
-| Bahasa | TypeScript (strict) |
-| Navigasi | Expo Router (berbasis file, stack + tab bawah, rute terproteksi) |
-| Penyimpanan lokal | `@react-native-async-storage/async-storage` |
-| Ikon | `lucide-react-native` dengan `react-native-svg` |
-| Pengujian | Test runner bawaan Node (`node:test`) |
-| Lint | ESLint dengan `eslint-config-expo` |
+## ✨ Fitur Unggulan
 
-Tidak ada backend, API berbayar, maupun API key.
+<table>
+  <tr>
+    <td width="50%">
+      <h3>📊 Dashboard</h3>
+      Ringkasan trip, status pengiriman, prioritas order, timeline stop, dan aktivitas terbaru.
+    </td>
+    <td width="50%">
+      <h3>🚚 Trip Management</h3>
+      Daftar trip berdasarkan tanggal dan status, detail kendaraan, jadwal, stop, serta log aktivitas.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <h3>📦 Delivery Orders</h3>
+      Pencarian berdasarkan nomor DO, penerima, kota, atau alamat, disertai filter status.
+    </td>
+    <td width="50%">
+      <h3>✅ Delivery Processing</h3>
+      Mulai pengiriman, konfirmasi penerima, catatan, bukti simulasi, dan laporan kegagalan.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <h3>📜 Delivery History</h3>
+      Riwayat trip dan pengiriman yang dapat difilter berdasarkan tanggal dan hasil.
+    </td>
+    <td width="50%">
+      <h3>⚙️ Profile & Settings</h3>
+      Informasi driver, kendaraan, pengaturan prioritas, reset data demo, dan logout.
+    </td>
+  </tr>
+</table>
 
-## Struktur folder
+### 🛡️ Business Rules
 
+Aturan bisnis dipisahkan dari UI agar proses pengiriman lebih konsisten dan mudah diuji.
+
+| Proses | Validasi |
+|---|---|
+| Mulai trip | Trip harus berstatus `Assigned`, sesuai jadwal, dan tidak ada trip lain yang sedang berjalan. |
+| Mulai order | Trip harus `In Progress`; satu order aktif per trip. |
+| Konfirmasi DO | Order harus `In Transit`; nama penerima 3–60 karakter. |
+| Bukti pengiriman | Order berprioritas tinggi wajib memiliki bukti simulasi. |
+| Pengiriman gagal | Alasan harus valid; alasan lainnya membutuhkan penjelasan minimal 5 karakter. |
+| Penyelesaian trip | Status akhir ditentukan otomatis berdasarkan hasil semua stop. |
+
+**Status flow**
+
+```mermaid
+flowchart TD
+    A["Trip Assigned"] --> B["Trip In Progress"]
+    B --> C["Order In Transit"]
+    C --> D["Delivered"]
+    C --> E["Failed"]
+    D --> F{"Semua stop selesai?"}
+    E --> F
+    F -- Ya --> G["Trip Completed / Failed"]
+    F -- Belum --> B
+
+    classDef initial fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+    classDef process fill:#ede9fe,stroke:#7c3aed,color:#4c1d95
+    classDef success fill:#dcfce7,stroke:#16a34a,color:#14532d
+    classDef failure fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+    class A initial
+    class B,C,F process
+    class D,G success
+    class E failure
 ```
+
+## 🧰 Teknologi
+
+<div align="center">
+
+| Teknologi | Penggunaan |
+|---|---|
+| ⚛️ React Native | Antarmuka mobile |
+| 🟣 Expo SDK 58 | Development dan bundling |
+| 🔷 TypeScript | Type safety dengan strict mode |
+| 🧭 Expo Router | Navigasi berbasis file |
+| 💾 AsyncStorage | Penyimpanan lokal |
+| 🎨 Lucide React Native | Ikon antarmuka |
+| 🧪 Node.js Test Runner | Unit testing |
+| 🧹 ESLint | Pemeriksaan kualitas kode |
+
+</div>
+
+## 🏗️ Arsitektur
+
+```text
+┌───────────────────────────────┐
+│        Mobile Interface       │
+│  Login · Trip · Orders · DO   │
+└───────────────┬───────────────┘
+                │ User Actions
+                ▼
+┌───────────────────────────────┐
+│         App Provider           │
+│       State Management         │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│       Business Rules           │
+│        tripRules.ts            │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│        AsyncStorage            │
+│       Local Persistence        │
+└───────────────────────────────┘
+```
+
+Semua aksi utama diproses melalui provider dan fungsi aturan bisnis. Perubahan yang valid memperbarui state dan disimpan ke perangkat, sedangkan aksi yang tidak valid menghasilkan pesan error tanpa mengubah data.
+
+## 📁 Struktur Proyek
+
+```text
 tms-mobile-app/
-├── assets/images/            Ikon aplikasi, ikon adaptif, splash, logo
+├── assets/
+│   └── images/
+├── docs/
+│   └── screenshots/
 ├── src/
-│   ├── app/                  Rute Expo Router
-│   │   ├── _layout.tsx       Provider, splash, stack terproteksi
+│   ├── app/
+│   │   ├── _layout.tsx
 │   │   ├── login.tsx
-│   │   ├── (tabs)/           Beranda, Trip, Order, Riwayat, Profil
-│   │   ├── trip/[id].tsx     Detail trip
-│   │   ├── order/[id].tsx    Detail delivery order
-│   │   └── deliver/[id].tsx  Proses pengiriman
-│   ├── components/           Komponen UI reusable
-│   ├── constants/            Token tema, label, konstanta domain
-│   ├── data/                 Fixtures dan generator data sintetis
-│   ├── services/             Aturan bisnis, cek login demo, penyimpanan
-│   ├── state/                Provider state aplikasi
-│   ├── types/                Tipe TypeScript bersama
-│   └── utils/                Fungsi tanggal
-├── tests/                    Unit test aturan, data seed, filter, login
+│   │   ├── (tabs)/
+│   │   ├── trip/[id].tsx
+│   │   ├── order/[id].tsx
+│   │   └── deliver/[id].tsx
+│   ├── components/
+│   ├── constants/
+│   ├── data/
+│   ├── services/
+│   ├── state/
+│   ├── types/
+│   └── utils/
+├── tests/
 ├── app.json
-├── eslint.config.js
-├── tsconfig.json
-└── package.json
+├── package.json
+└── README.md
 ```
 
-## Memulai
+## 🚀 Instalasi
 
-Kebutuhan: Node.js 22.18 atau lebih baru (unit test menjalankan file TypeScript langsung), npm, dan ponsel Android dengan aplikasi **Expo Go** atau emulator Android.
+### Persyaratan
+
+- Node.js 22.18 atau lebih baru.
+- npm.
+- Android dengan Expo Go yang kompatibel atau emulator Android.
+
+### 1. Clone repository
+
+```bash
+git clone https://github.com/sirajfatwasidqy/TMS-MOBILE.git
+cd TMS-MOBILE
+```
+
+### 2. Instal dependensi
 
 ```bash
 npm install
+```
+
+### 3. Jalankan aplikasi
+
+```bash
 npx expo start
 ```
 
-- **Ponsel fisik:** pasang Expo Go dari Google Play, pastikan ponsel dan komputer berada di jaringan yang sama, lalu pindai kode QR di terminal.
-- **Emulator:** jalankan Android Virtual Device dari Android Studio, lalu tekan `a` di terminal atau jalankan `npm run android`.
+Pindai QR code menggunakan Expo Go. Pastikan laptop dan HP berada di jaringan yang sama.
 
-Expo Go harus mendukung SDK 58. Jika muncul pesan versi tidak cocok, perbarui Expo Go dari Play Store.
-
-### Skrip yang berguna
+Jika koneksi lokal bermasalah, coba:
 
 ```bash
-npm run typecheck   # tsc --noEmit
-npm run lint        # expo lint
-npm test            # unit test
-npm run check       # ketiganya
+npx expo start --tunnel
 ```
 
-## Login demo
+### 🧪 Pemeriksaan Kode
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run check
+```
+
+## 🔑 Akun Demo
 
 | Kolom | Nilai |
-| --- | --- |
-| ID driver | `RAJA123` |
-| Kata sandi | `123RAJA` |
+|---|---|
+| ID Driver | `RAJA123` |
+| Kata Sandi | `123RAJA` |
+| Nama Driver | Raja Pratama |
 
-Layar masuk juga memiliki tombol **Isi akun demo**. ID tidak membedakan huruf besar/kecil, kata sandi membedakan.
+Gunakan akun tersebut hanya untuk pengujian aplikasi demo.
 
-## Data contoh
+## 📦 Data Sintetis
 
-`src/data/seed.ts` membuat dataset yang konsisten relatif terhadap tanggal saat aplikasi pertama kali dibuka:
+Aplikasi menyediakan contoh data untuk menguji berbagai skenario operasional:
 
-- 8 trip dan 19 delivery order dalam satu minggu, satu driver, dan dua kendaraan.
-- Hari ini: satu trip `In Progress` (satu order terkirim, satu dalam perjalanan, satu menunggu) dan satu trip `Assigned` untuk sore hari.
-- Besok: satu trip `Assigned` yang belum bisa dimulai.
-- Hari-hari sebelumnya: trip selesai, satu trip dengan stop gagal, dan satu trip yang seluruh stop-nya gagal.
-- ID trip dan order mengikuti format `TRP-yymmdd-nn` dan `DO-yymmdd-nnn` dan bersifat unik.
+- 8 trip dan 19 delivery order.
+- Satu driver dan dua kendaraan.
+- Trip aktif, trip terjadwal, pengiriman selesai, serta pengiriman gagal.
+- ID trip dan DO unik dengan relasi data yang konsisten.
 
-Karena tanggal data bersifat relatif terhadap hari pertama dibuka, gunakan **Profil → Reset data demo** untuk membuat ulang data di sekitar hari ini jika Anda membuka aplikasi di hari berikutnya dan "hari ini" tampak kosong.
+Data disimpan secara lokal di perangkat. Gunakan menu **Profil → Reset data demo** untuk membuat ulang dataset.
 
-## Arsitektur dan alur data
+## 🧪 Status Pengujian
 
-```
-Layar ──aksi──▶ AppProvider ──▶ tripRules (murni) ──▶ AppData baru atau pesan error
-   ▲                  │
-   └──── useApp() ◀───┴──▶ storage (AsyncStorage)
-```
+| Pemeriksaan | Status |
+|---|---|
+| TypeScript typecheck | ✅ Lolos |
+| Expo lint | ✅ Lolos |
+| Unit test | ✅ 17 test lolos |
+| Android export | ✅ Berhasil |
+| Pengujian visual perangkat | ⏳ Belum diverifikasi |
+| iOS dan web | ⏳ Belum diuji |
 
-1. Layar membaca state lewat `useApp()` dan tidak pernah mengubah data sendiri.
-2. Aksi pengguna (`startTrip`, `startOrder`, `confirmDelivery`, `reportFailure`) memanggil fungsi murni di `tripRules`. Hasilnya berupa `AppData` baru atau pesan error.
-3. Jika berhasil, provider mengganti state dan menyimpannya ke AsyncStorage. Jika gagal, layar menampilkan pesan dan tidak ada yang berubah.
-4. Hitungan di beranda, filter, dan pengurutan diturunkan dari state yang sama, sehingga perubahan status langsung tampil di semua layar.
-5. Logika bisnis tidak mengimpor React maupun React Native, sehingga bisa diuji dengan Node biasa.
+Status ini mencerminkan hasil pemeriksaan pengembangan yang tercatat saat proyek dibuat, bukan hasil pengujian terbaru pada setiap perangkat.
 
-## Status pengujian
+## ⚠️ Batasan
 
-Dijalankan di lingkungan pengembangan repositori ini:
+- Login masih berupa simulasi lokal, bukan autentikasi produksi.
+- Tidak ada backend atau sinkronisasi antarpengguna.
+- Tidak ada pelacakan GPS real-time atau peta aktif.
+- Bukti pengiriman masih berupa simulasi, bukan foto atau tanda tangan yang tersimpan.
+- Data demo hanya disimpan di perangkat.
 
-- `tsc --noEmit` lolos tanpa error.
-- `expo lint` lolos tanpa warning maupun error.
-- 17 unit test lolos, mencakup integritas data seed (ID unik, relasi valid, konsistensi status), aturan trip dan pengiriman, validasi, penutupan trip otomatis, filter, rentang tanggal, dan validasi login.
-- `expo export --platform android` berhasil membuat bundle Android, sehingga tidak ada import yang rusak.
-- `expo-doctor` lolos 18 dari 20 pemeriksaan; dua sisanya membutuhkan akses internet ke server Expo dan tidak bisa dijalankan di lingkungan tersebut. Jalankan `npx expo-doctor` di komputer Anda.
+## 🛣️ Roadmap
 
-**Belum diuji:**
+- [ ] Integrasi backend dan autentikasi berbasis peran.
+- [ ] Foto dan tanda tangan digital sebagai bukti pengiriman.
+- [ ] Sinkronisasi data saat koneksi kembali tersedia.
+- [ ] Peta rute dan navigasi.
+- [ ] Notifikasi push untuk penugasan trip.
+- [ ] Pengujian UI dan end-to-end.
+- [ ] Dukungan bahasa Inggris dan tema gelap.
 
-- Aplikasi belum dijalankan di perangkat Android fisik maupun emulator, sehingga tata letak, perilaku keyboard, dan interaksi sentuh belum diverifikasi secara visual.
-- iOS dan web belum diuji.
-- Belum ada pengujian UI atau end-to-end otomatis.
+## 🔒 Disclaimer
 
-## Keterbatasan
+TMS Mobile merupakan proyek portofolio independen yang menggunakan data sintetis. Proyek ini tidak terhubung dengan sistem internal perusahaan mana pun dan tidak mewakili produk resmi perusahaan.
 
-- **Autentikasi hanya simulasi.** Akun demo dicek secara lokal di kode klien. Ini tidak aman dan tidak boleh dipakai ulang untuk sistem sungguhan.
-- **Tidak ada backend.** Data hanya ada di perangkat; tidak ada sinkronisasi, multi-pengguna, atau tampilan dispatcher.
-- **Tidak ada GPS atau peta sungguhan.** Timeline stop hanya menampilkan urutan stop dan tidak melacak apa pun secara real-time.
-- **Bukti pengiriman hanya placeholder.** Mengambil bukti hanya mencatat waktu; tidak ada foto atau tanda tangan yang disimpan.
-- **Satu driver.** Dataset berisi satu driver dan dua kendaraan.
-- **Tanggal demo relatif.** Tanggal seed bergantung pada hari pertama aplikasi dibuka; gunakan opsi reset untuk menyegarkannya.
-- **Hanya Bahasa Indonesia**, memakai waktu lokal tanpa penanganan zona waktu.
+Logo Duta Abadi Primantara hanya boleh dipublikasikan sesuai izin pemilik hak terkait. Logo dan aset merek tidak termasuk dalam lisensi kode proyek.
 
-## Pengembangan selanjutnya
+## 📄 Lisensi
 
-- API backend dengan autentikasi sungguhan dan akses berbasis peran.
-- Foto dan tanda tangan digital untuk bukti pengiriman, dengan kompresi lokal dan unggah.
-- Antrean offline yang menyinkronkan perubahan status saat koneksi kembali.
-- Tampilan peta dengan stop rute dan navigasi.
-- Notifikasi push untuk trip yang baru ditugaskan.
-- Pengujian komponen dan end-to-end (misalnya React Native Testing Library dan Maestro).
-- Pilihan bahasa (English) dan tema gelap, serta tinjauan aksesibilitas dengan screen reader.
+Kode sumber dilisensikan di bawah [MIT License](LICENSE). Lisensi tersebut tidak mencakup logo, merek dagang, maupun aset pihak ketiga.
 
-## Lisensi
+---
 
-Kode berlisensi MIT, lihat [LICENSE](LICENSE). Lisensi ini tidak mencakup logo Duta Abadi Primantara (`assets/images/logo-dap.png` dan turunannya); logo tetap milik pemiliknya.
+<div align="center">
+
+  **Built with TypeScript, React Native & Expo**
+
+  *Exploring mobile development, business process automation, and transportation management systems.*
+
+  <sub>Independent portfolio project · Indonesia 🇮🇩</sub>
+
+</div>
